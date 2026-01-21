@@ -63,7 +63,7 @@ echo "=== Pull Kubernetes images ==="
 kubeadm config images pull
 
 sudo kubeadm init phase upload-certs --upload-certs
-
+kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/calico.yaml
 #create firsh master
 echo "=== create the Kubernetes main master ==="
 
