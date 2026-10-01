@@ -6,14 +6,10 @@
       ansible.builtin.blockinfile:
         path: /etc/hosts
         block: |
-          10.60.2.50   deployer.cesc.co.in            deployer
-          10.60.2.44   local-master-001.cesc.co.in    local-master-001
-          10.60.2.45   local-master-002.cesc.co.in    local-master-002
-          10.60.2.46   local-master-003.cesc.co.in    local-master-003
-          10.60.2.47   local-slave-001.cesc.co.in     local-slave-001
-          10.60.2.48   local-slave-002.cesc.co.in     local-slave-002
-          10.60.2.49   local-slave-003.cesc.co.in     local-slave-003
-          10.40.2.50   local-reg-001.cesc.co.in       local-reg-001
+          a.a.a.a   deployer.example.com            deployer
+          b.b.b.b  local-master-001.example.com    local-master-001
+          ...
+          ...
         marker: "# {mark} ANSIBLE MANAGED K8S HOSTS"
 
 - hosts: master_servers[0]
