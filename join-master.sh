@@ -63,6 +63,6 @@ echo "=== Pull Kubernetes images ==="
 kubeadm config images pull
 
 echo "=== Join the Kubernetes cluster ==="
-kubeadm join 172.31.32.708:6443 --token 2bchyu.28khfyxmrwb6xbv --discovery-token-ca-cert-hash sha256:31e70e646c54667f85976edb4ca14ca42187ec42a882dc9cd6de0314bb4ae4c --control-plane --certificate-key 14609589f115b2e98c0552ab5cffe63bfa7bc0737cf13e02f2031d209bbcf77
+#kubeadm join 172.31.32.708:6443 --token 2bchyu.28khfyxmrwb6xbv --discovery-token-ca-cert-hash sha256:31e70e646c54667f85976edb4ca14ca42187ec42a882dc9cd6de0314bb4ae4c --control-plane --certificate-key 14609589f115b2e98c0552ab5cffe63bfa7bc0737cf13e02f2031d209bbcf77
 
 echo "=== Worker node successfully joined the cluster ==="

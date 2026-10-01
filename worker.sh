@@ -62,9 +62,9 @@ systemctl enable --now kubelet
 echo "=== Pull Kubernetes images ==="
 kubeadm config images pull
 
-echo "=== Join the Kubernetes cluster ==="
-kubeadm join 172.31.32.78:6443 \
-  --token qg9nc9.r3zslq0ooq0i7qdu \
-  --discovery-token-ca-cert-hash sha256:31e70e646c54667f85976edb4bca14ca42187ec42a882dc9cd6de0314bb4ae4c
+#echo "=== Join the Kubernetes cluster ==="
+#kubeadm join 172.31.32.78:6443 \
+#  --token qg9nc9.r3zslq0ooq0i7qdu \
+#  --discovery-token-ca-cert-hash sha256:31e70e646c54667f85976edb4bca14ca42187ec42a882dc9cd6de0314bb4ae4c
 
-echo "=== Worker node successfully joined the cluster ==="
+#echo "=== Worker node successfully joined the cluster ==="

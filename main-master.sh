@@ -67,4 +67,3 @@ kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/
 #create firsh master
 echo "=== create the Kubernetes main master ==="
 
-echo "=== Worker node successfully joined the cluster ==="

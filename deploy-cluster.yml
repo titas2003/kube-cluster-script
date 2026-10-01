@@ -1,0 +1,79 @@
+---
+- hosts: master_servers, slave_servers
+  become: yes
+  tasks:
+    - name: Ensure all cluster hostnames are present in /etc/hosts
+      ansible.builtin.blockinfile:
+        path: /etc/hosts
+        block: |
+          10.60.2.50   deployer.cesc.co.in            deployer
+          10.60.2.44   local-master-001.cesc.co.in    local-master-001
+          10.60.2.45   local-master-002.cesc.co.in    local-master-002
+          10.60.2.46   local-master-003.cesc.co.in    local-master-003
+          10.60.2.47   local-slave-001.cesc.co.in     local-slave-001
+          10.60.2.48   local-slave-002.cesc.co.in     local-slave-002
+          10.60.2.49   local-slave-003.cesc.co.in     local-slave-003
+          10.40.2.50   local-reg-001.cesc.co.in       local-reg-001
+        marker: "# {mark} ANSIBLE MANAGED K8S HOSTS"
+
+- hosts: master_servers[0]
+  become: yes
+  tasks:
+    - name: 1. Initialize First Kubernetes Master
+      ansible.builtin.shell: |
+        kubeadm init \
+          --control-plane-endpoint="10.60.2.50:6443" \
+          --upload-certs \
+          --pod-network-cidr=192.168.0.0/16
+      args:
+        creates: /etc/kubernetes/admin.conf
+
+    - name: 2. Create .kube directory for root on Master 1
+      ansible.builtin.file:
+        path: /root/.kube
+        state: directory
+        mode: '0755'
+
+    - name: 3. Copy admin.conf to root's kube config
+      ansible.builtin.copy:
+        src: /etc/kubernetes/admin.conf
+        dest: /root/.kube/config
+        remote_src: yes
+
+    - name: 4. Get Control Plane Join Command with Certificate Key
+      ansible.builtin.shell: kubeadm token create --print-join-command --certificate-key $(kubeadm init phase upload-certs --upload-certs | tail -1)
+      register: control_plane_join_cmd
+
+    - name: 5. Get Worker Join Command
+      ansible.builtin.shell: kubeadm token create --print-join-command
+      register: worker_join_cmd
+
+    - name: 6. Save join commands to localhost facts
+      ansible.builtin.set_fact:
+        cp_join_cmd: "{{ control_plane_join_cmd.stdout }}"
+        wk_join_cmd: "{{ worker_join_cmd.stdout }}"
+      delegate_to: localhost
+      delegate_facts: yes
+
+    - name: 7. Install Calico CNI Network Plugin
+      ansible.builtin.shell: |
+        export KUBECONFIG=/etc/kubernetes/admin.conf
+        kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/calico.yaml
+      args:
+        executable: /bin/bash
+
+- hosts: master_servers[1:]
+  become: yes
+  tasks:
+    - name: 8. Join Remaining Control Plane Masters
+      ansible.builtin.shell: "{{ hostvars['localhost']['cp_join_cmd'] }}"
+      args:
+        creates: /etc/kubernetes/pki/ca.crt
+
+- hosts: slave_servers
+  become: yes
+  tasks:
+    - name: 9. Join Worker Nodes to the Cluster
+      ansible.builtin.shell: "{{ hostvars['localhost']['wk_join_cmd'] }}"
+      args:
+        creates: /etc/kubernetes/pki/ca.crt
